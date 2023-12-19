@@ -6,7 +6,7 @@ OBJ=	cpp/plblas.o
 
 $(SOBJ): $(OBJ)
 	mkdir -p $(PACKSODIR)
-	$(LD) $(LDSOFLAGS) -o $@ $(OBJ) $(SWISOLIB)
+	$(LD) $(LDSOFLAGS) -o $@ $(OBJ) $(SWISOLIB) -larmadillo
 
 check::
 
