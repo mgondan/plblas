@@ -5,7 +5,7 @@ all:    $(SOBJ)
 OBJ=	cpp/plblas.o
 
 %.o:	%.cpp
-	$(CC) -c $(CFLAGS) $@
+	$(CC) -c $(CFLAGS) $*.cpp
 
 $(SOBJ): $(OBJ)
 	mkdir -p $(PACKSODIR)
