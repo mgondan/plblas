@@ -1,6 +1,6 @@
 :- module(plblas, []).
 
-:- load_foreign_library(plblas).
+:- load_foreign_library(foreign(plblas)).
 
 :- multifile user:portray/1.
 
