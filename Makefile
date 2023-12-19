@@ -4,6 +4,9 @@ all:    $(SOBJ)
 
 OBJ=	cpp/plblas.o
 
+%.o:	%.cpp
+	$(CC) -c $(CFLAGS) $@
+
 $(SOBJ): $(OBJ)
 	mkdir -p $(PACKSODIR)
 	$(LD) $(LDSOFLAGS) -o $@ $(OBJ) $(SWISOLIB) -larmadillo
