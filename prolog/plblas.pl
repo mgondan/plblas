@@ -1,4 +1,4 @@
-:- module(matrix, []).
+:- module(plblas, []).
 
 :- load_foreign_library(plblas).
 
