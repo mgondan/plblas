@@ -1,4 +1,4 @@
-:- module(plblas, [test_plblas/0]).
+:- module(plblas, []).
 
 :- load_foreign_library(foreign(plblas)).
 
@@ -9,13 +9,12 @@ user:portray(Matrix) :-
     !,
     matrix_portray(current_output, Matrix).
 
-test_plblas :-
-  true.
-
 :- begin_tests(plblas).
-% :- use_module(library(plblas)).
 
-test(plblas) :-
-  test_plblas.
+test(mult) :-
+  matrix(2, 3, A), ones(A),
+  matrix(3, 2, B), ones(B),
+  mult(A, B, X),
+  get1(1, 1, X, 3.0).
 
 :- end_tests(plblas).
