@@ -16,4 +16,6 @@ jobs:
         os: [ubuntu]
     steps:
       - uses: actions/checkout@v2
+      - name: Install armadillo
+        run: apt-get install libarmadillo-dev
       - uses: royratcliffe/swi-prolog-pack-cover@main
