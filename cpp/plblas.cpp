@@ -1,11 +1,13 @@
 #include <armadillo>
 #include <SWI-cpp2.h>
 
-using namespace arma;
+using namespace arma ;
 
-struct Matrix;
+struct Matrix ;
+struct Column ;
 
-static PL_blob_t matrix = PL_BLOB_DEFINITION(Matrix, "matrix");
+static PL_blob_t matrix = PL_BLOB_DEFINITION(Matrix, "matrix") ;
+static PL_blob_t column = PL_BLOB_DEFINITION(Column, "column") ;
 
 struct Matrix : public PlBlob
 {
@@ -14,110 +16,158 @@ struct Matrix : public PlBlob
   explicit Matrix()
     : PlBlob(&matrix),
       m()
-  { 
-  }
+  { }
 
   explicit Matrix(const mat& am)
     : PlBlob(&matrix),
       m(am)
-  {
-  }
+  { }
 
   PL_BLOB_SIZE
 
   void portray(PlStream& strm) const ;
 
-  // Fill
-  void zeros() 
-  { m.zeros() ; 
-  }
-
-  void ones()
-  { m.ones() ;
-  }
-
-  void eye()
-  { m.eye() ;
-  }
-
-  void randu()
-  { m.randu() ;
-  }
-
-  void randn()
-  { m.randn() ;
-  }
-
-  void fill(const double v)
-  { m.fill(v) ;
-  }
-
-  // Element access
   double& operator()(uword r, uword c)
   { return m(r, c) ;
+  }
+} ;
+
+struct Column : public PlBlob
+{
+  vec v ;
+
+  explicit Column()
+    : PlBlob(&column),
+      v()
+  { }
+
+  explicit Column(const vec& av)
+    : PlBlob(&column),
+      v(av)
+  { }
+
+  PL_BLOB_SIZE
+
+  void portray(PlStream& strm) const ;
+
+  double& operator()(uword i)
+  { return v(i) ;
   }
 } ;
 
 PREDICATE(matrix, 3)
 { mat m(A1.as_int32_t(), A2.as_int32_t()) ;
   auto ref = std::unique_ptr<PlBlob>(new Matrix(m)) ;
-  return A3.unify_blob(&ref);
+  return A3.unify_blob(&ref) ;
 }
 
 PREDICATE(matrix_portray, 2)
-{ auto ref = PlBlobV<Matrix>::cast_ex(A2, matrix);
-  PlTerm a1(A1);
-  PlStream s(a1, SIO_OUTPUT);
-  ref->portray(s);
-  return true;
+{ auto ref = PlBlobV<Matrix>::cast_ex(A2, matrix) ;
+  PlTerm a1(A1) ;
+  PlStream s(a1, SIO_OUTPUT) ;
+  ref->portray(s) ;
+  return true ;
 }
 
 void Matrix::portray(PlStream& s) const
 {
-  s.printf("Matrix(rows=%u cols=%u)\n", m.n_rows, m.n_cols);
+  s.printf("Matrix(rows=%u cols=%u)\n", m.n_rows, m.n_cols) ;
   for(uword i=0; i<m.n_rows; i++)
   {
     for(uword j=0; j<m.n_cols; j++)
-      s.printf(" %.3f", m(i, j));
-    s.printf("\n");
+      s.printf(" %.3f", m(i, j)) ;
+    s.printf("\n") ;
   }
-  s.printf("\n");
+  s.printf("\n") ;
 }
 
-PREDICATE(zeros, 1)
-{ auto m = PlBlobV<Matrix>::cast_ex(A1, matrix) ;
-  m->zeros() ;
+PREDICATE(column, 2)
+{ vec v(A1.as_int32_t()) ;
+  auto ref = std::unique_ptr<PlBlob>(new Column(v)) ;
+  return A2.unify_blob(&ref);
+}
+
+PREDICATE(column_portray, 2)
+{ auto ref = PlBlobV<Column>::cast_ex(A2, column) ;
+  PlTerm a1(A1) ;
+  PlStream s(a1, SIO_OUTPUT) ;
+  ref->portray(s) ;
   return true ;
 }
 
-PREDICATE(ones, 1)
-{ auto m = PlBlobV<Matrix>::cast_ex(A1, matrix) ;
-  m->ones() ;
+void Column::portray(PlStream& s) const
+{
+  s.printf("Column(rows=%u)\n", m.n_rows) ;
+  for(uword i=0; i<m.n_rows; i++)
+    s.printf(" %.3f", v(i)) ;
+  s.printf("\n") ;
+}
+
+PREDICATE(matrix_zeros, 1)
+{ auto ref = PlBlobV<Matrix>::cast_ex(A1, matrix) ;
+  ref->m.zeros() ;
   return true ;
 }
 
-PREDICATE(eye, 1)
-{ auto m = PlBlobV<Matrix>::cast_ex(A1, matrix) ;
-  m->eye() ;
+PREDICATE(matrix_ones, 1)
+{ auto ref = PlBlobV<Matrix>::cast_ex(A1, matrix) ;
+  ref->m.ones() ;
   return true ;
 }
 
-PREDICATE(randu, 1)
-{ auto m = PlBlobV<Matrix>::cast_ex(A1, matrix) ;
-  m->randu() ;
+PREDICATE(matrix_eye, 1)
+{ auto ref = PlBlobV<Matrix>::cast_ex(A1, matrix) ;
+  ref->m.eye() ;
   return true ;
 }
 
-PREDICATE(randn, 1)
-{ auto m = PlBlobV<Matrix>::cast_ex(A1, matrix) ;
-  m->randn() ;
+PREDICATE(matrix_randu, 1)
+{ auto ref = PlBlobV<Matrix>::cast_ex(A1, matrix) ;
+  ref->m.randu() ;
   return true ;
 }
 
-PREDICATE(fill, 2)
-{ auto m = PlBlobV<Matrix>::cast_ex(A1, matrix) ;
-  double v = A2.as_double() ;
-  m->fill(v) ;
+PREDICATE(matrix_randn, 1)
+{ auto ref = PlBlobV<Matrix>::cast_ex(A1, matrix) ;
+  ref->m.randn() ;
+  return true ;
+}
+
+PREDICATE(matrix_fill, 2)
+{ auto ref = PlBlobV<Matrix>::cast_ex(A1, matrix) ;
+  double f = A2.as_double() ;
+  ref->m.fill(f) ;
+  return true ;
+}
+
+PREDICATE(column_zeros, 1)
+{ auto ref = PlBlobV<Column>::cast_ex(A1, column) ;
+  ref->v.zeros() ;
+  return true ;
+}
+
+PREDICATE(column_ones, 1)
+{ auto ref = PlBlobV<Column>::cast_ex(A1, column) ;
+  ref->v.ones() ;
+  return true ;
+}
+
+PREDICATE(column_randu, 1)
+{ auto ref = PlBlobV<Column>::cast_ex(A1, column) ;
+  ref->v.randu() ;
+  return true ;
+}
+
+PREDICATE(column_randn, 1)
+{ auto ref = PlBlobV<Column>::cast_ex(A1, column) ;
+  ref->v.randn() ;
+  return true ;
+}
+
+PREDICATE(column_fill, 2)
+{ auto ref = PlBlobV<Column>::cast_ex(A1, column) ;
+  double f = A2.as_double() ;
+  ref->v.fill(f) ;
   return true ;
 }
 
@@ -129,37 +179,68 @@ PREDICATE(mult, 3)
   return A3.unify_blob(&ref) ;
 }
 
-PREDICATE(get0, 4)
+PREDICATE(matrix_get0, 4)
 { auto r = A1.as_int32_t() ;
   auto c = A2.as_int32_t() ;
-  auto m = PlBlobV<Matrix>::cast_ex(A3, matrix) ;
-  double x = m->operator()(r, c) ;
+  auto ref = PlBlobV<Matrix>::cast_ex(A3, matrix) ;
+  double x = ref->m(r, c) ;
   return A4.unify_float(x) ;
 }
 
-PREDICATE(get1, 4)
+PREDICATE(matrix_get1, 4)
 { auto r = A1.as_int32_t() ;
   auto c = A2.as_int32_t() ;
-  auto m = PlBlobV<Matrix>::cast_ex(A3, matrix) ;
-  double x = m->operator()(--r, --c) ;
+  auto ref = PlBlobV<Matrix>::cast_ex(A3, matrix) ;
+  double x = ref->m(--r, --c) ;
   return A4.unify_float(x) ;
 }
 
-PREDICATE(put0, 4)
+PREDICATE(matrix_put0, 4)
 { auto r = A1.as_int32_t() ;
   auto c = A2.as_int32_t() ;
-  auto m = PlBlobV<Matrix>::cast_ex(A3, matrix) ;
+  auto ref = PlBlobV<Matrix>::cast_ex(A3, matrix) ;
   double x = A4.as_double() ;
-  m->operator()(r, c) = x ;
+  ref->m(r, c) = x ;
   return true ;
 }
 
-PREDICATE(put1, 4)
+PREDICATE(matrix_put1, 4)
 { auto r = A1.as_int32_t() ;
   auto c = A2.as_int32_t() ;
-  auto m = PlBlobV<Matrix>::cast_ex(A3, matrix) ;
+  auto ref = PlBlobV<Matrix>::cast_ex(A3, matrix) ;
   double x = A4.as_double() ;
-  m->operator()(--r, --c) = x ;
+  ref->m(--r, --c) = x ;
   return true ;
 }
+
+PREDICATE(column_get0, 3)
+{ auto i = A1.as_int32_t() ;
+  auto ref = PlBlobV<Column>::cast_ex(A2, column) ;
+  double x = ref->v(i) ;
+  return A3.unify_float(x) ;
+}
+
+PREDICATE(column_get1, 3)
+{ auto i = A1.as_int32_t() ;
+  auto ref = PlBlobV<Column>::cast_ex(A2, column) ;
+  double x = ref->v(--i) ;
+  return A3.unify_float(x) ;
+}
+
+PREDICATE(column_put0, 3)
+{ auto i = A1.as_int32_t() ;
+  auto ref = PlBlobV<Column>::cast_ex(A2, column) ;
+  double x = A3.as_double() ;
+  ref->v(i) = x ;
+  return true ;
+}
+
+PREDICATE(column_put1, 3)
+  auto i = A1.as_int32_t() ;
+  auto ref = PlBlobV<Column>::cast_ex(A2, column) ;
+  double x = A3.as_double() ;
+  ref->v(--i) = x ;
+  return true ;
+}
+
 
