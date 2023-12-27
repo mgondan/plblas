@@ -13,7 +13,7 @@ test_plblas :-
   true.
 
 :- begin_tests(plblas).
-:- use_module(library(plblas)).
+% :- use_module(library(plblas)).
 
 test(plblas) :-
   test_plblas.
