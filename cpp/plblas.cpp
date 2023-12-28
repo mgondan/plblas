@@ -97,8 +97,8 @@ PREDICATE(column_portray, 2)
 
 void Column::portray(PlStream& s) const
 {
-  s.printf("Column(rows=%u)\n", m.n_rows) ;
-  for(uword i=0; i<m.n_rows; i++)
+  s.printf("Column(rows=%u)\n", v.n_rows) ;
+  for(uword i=0; i<v.n_rows; i++)
     s.printf(" %.3f", v(i)) ;
   s.printf("\n") ;
 }
