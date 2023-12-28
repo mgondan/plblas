@@ -236,7 +236,7 @@ PREDICATE(column_put0, 3)
 }
 
 PREDICATE(column_put1, 3)
-  auto i = A1.as_int32_t() ;
+{ auto i = A1.as_int32_t() ;
   auto ref = PlBlobV<Column>::cast_ex(A2, column) ;
   double x = A3.as_double() ;
   ref->v(--i) = x ;
