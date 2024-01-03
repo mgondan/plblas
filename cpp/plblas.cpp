@@ -10,8 +10,7 @@ static PL_blob_t matrix = PL_BLOB_DEFINITION(Matrix, "matrix") ;
 static PL_blob_t column = PL_BLOB_DEFINITION(Column, "column") ;
 
 struct Matrix : public PlBlob
-{
-  mat m ;
+{ mat m ;
 
   explicit Matrix()
     : PlBlob(&matrix),
@@ -33,8 +32,7 @@ struct Matrix : public PlBlob
 } ;
 
 struct Column : public PlBlob
-{
-  vec v ;
+{ vec v ;
 
   explicit Column()
     : PlBlob(&column),
@@ -61,45 +59,14 @@ PREDICATE(matrix, 3)
   return A3.unify_blob(&ref) ;
 }
 
-PREDICATE(matrix_portray, 2)
-{ auto ref = PlBlobV<Matrix>::cast_ex(A2, matrix) ;
-  PlTerm a1(A1) ;
-  PlStream s(a1, SIO_OUTPUT) ;
-  ref->portray(s) ;
-  return true ;
-}
-
 void Matrix::portray(PlStream& s) const
-{
-  s.printf("Matrix(rows=%u cols=%u)\n", m.n_rows, m.n_cols) ;
+{ s.printf("Matrix(rows=%u cols=%u)\n", m.n_rows, m.n_cols) ;
   for(uword i=0; i<m.n_rows; i++)
   {
     for(uword j=0; j<m.n_cols; j++)
       s.printf(" %.3f", m(i, j)) ;
     s.printf("\n") ;
   }
-  s.printf("\n") ;
-}
-
-PREDICATE(column, 2)
-{ vec v(A1.as_int32_t()) ;
-  auto ref = std::unique_ptr<PlBlob>(new Column(v)) ;
-  return A2.unify_blob(&ref);
-}
-
-PREDICATE(column_portray, 2)
-{ auto ref = PlBlobV<Column>::cast_ex(A2, column) ;
-  PlTerm a1(A1) ;
-  PlStream s(a1, SIO_OUTPUT) ;
-  ref->portray(s) ;
-  return true ;
-}
-
-void Column::portray(PlStream& s) const
-{
-  s.printf("Column(rows=%u)\n", v.n_rows) ;
-  for(uword i=0; i<v.n_rows; i++)
-    s.printf(" %.3f", v(i)) ;
   s.printf("\n") ;
 }
 
@@ -140,6 +107,19 @@ PREDICATE(matrix_fill, 2)
   return true ;
 }
 
+PREDICATE(column, 2)
+{ vec v(A1.as_int32_t()) ;
+  auto ref = std::unique_ptr<PlBlob>(new Column(v)) ;
+  return A2.unify_blob(&ref);
+}
+
+void Column::portray(PlStream& s) const
+{ s.printf("Column(rows=%u)\n", v.n_rows) ;
+  for(uword i=0; i<v.n_rows; i++)
+    s.printf(" %.3f\n", v(i)) ;
+  s.printf("\n") ;
+}
+
 PREDICATE(column_zeros, 1)
 { auto ref = PlBlobV<Column>::cast_ex(A1, column) ;
   ref->v.zeros() ;
@@ -169,6 +149,28 @@ PREDICATE(column_fill, 2)
   double f = A2.as_double() ;
   ref->v.fill(f) ;
   return true ;
+}
+
+PREDICATE(plblas_portray, 2)
+{ PlTerm a1(A1) ;
+  PlStream s(a1, SIO_OUTPUT) ;
+
+  PL_blob_t* type ;
+  PlCheckFail(A2.is_blob(&type)) ;
+  if(type == &matrix)
+  { auto ref = PlBlobV<Matrix>::cast_ex(A2, matrix) ;
+    ref->portray(s) ;
+    return true ;
+  }
+
+  if(type == &column)
+  { auto ref = PlBlobV<Column>::cast_ex(A2, column) ;
+    ref->portray(s) ;
+    return true ;
+  }
+
+  // We shouldn't end up here
+  throw PlFail() ;
 }
 
 PREDICATE(mult, 3)
@@ -242,5 +244,4 @@ PREDICATE(column_put1, 3)
   ref->v(--i) = x ;
   return true ;
 }
-
 

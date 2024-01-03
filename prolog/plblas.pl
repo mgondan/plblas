@@ -6,11 +6,11 @@
 
 user:portray(Matrix) :- 
     blob(Matrix, matrix), 
-    !, matrix_portray(current_output, Matrix).
+    !, plblas_portray(current_output, Matrix).
 
 user:portray(Column) :-
     blob(Column, column),
-    !, column_portray(current_output, Column).
+    !, plblas_portray(current_output, Column).
 
 zeros(Matrix) :-
     blob(Matrix, matrix),
