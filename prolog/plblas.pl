@@ -3,11 +3,11 @@
 :- multifile user:portray/1.
 :- load_foreign_library(foreign(plblas)).
 
-user:portray(X) :-
-    ( blob(X, matrix)
-    ; blob(X, column)
-    ),
-    !, plblas_portray(X).
+%user:portray(X) :-
+%    ( blob(X, matrix)
+%    ; blob(X, column)
+%    ),
+%    !, plblas_portray(X).
 
 zeros(Matrix) :-
     blob(Matrix, matrix),

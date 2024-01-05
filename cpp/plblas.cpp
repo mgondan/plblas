@@ -61,8 +61,10 @@ PREDICATE(matrix, 3)
 
 // PREDICATE(plblas_portray, 1)
 static foreign_t plblas_portray(term_t a1, int arity, control_t ctx)
-{ PL_blob_t* t ;;
-  PlCheckFail(((PlTerm) a1).is_blob(&t)) ;
+{ PL_blob_t* t ;
+  if(((PlTerm) a1).is_blob(&t) == false)
+    return false ;
+
   if(t == &matrix)
   { auto ref = PlBlobV<Matrix>::cast_ex((PlTerm) a1, matrix) ;
     PlStream s(PlTerm_atom("current_output"), SIO_OUTPUT) ;
@@ -77,10 +79,10 @@ static foreign_t plblas_portray(term_t a1, int arity, control_t ctx)
     return true ;
   }
 
-  throw PlFail() ;
+  return false ;
 }
 
-PlRegister x_plblas_portray_1("plblas", "plblas_portray", 1, plblas_portray) ;
+PlRegister x_plblas_portray_1("user", "portray", 1, plblas_portray) ;
 
 void Matrix::portray(PlStream& s) const
 { s.printf("Matrix(rows=%u cols=%u)\n", m.n_rows, m.n_cols) ;
