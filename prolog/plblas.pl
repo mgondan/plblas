@@ -1,16 +1,13 @@
 :- module(plblas, [zeros/1, ones/1, eye/1, randu/1, randn/1, fill/2, get0/4, get1/4, put0/4, put1/4, get0/3, get1/3, put0/3, put1/3]).
 
+:- multifile user:portray/1.
 :- load_foreign_library(foreign(plblas)).
 
-:- multifile user:portray/1.
-
-user:portray(Matrix) :- 
-    blob(Matrix, matrix), 
-    !, matrix_portray(current_output, Matrix).
-
-user:portray(Column) :-
-    blob(Column, column),
-    !, column_portray(current_output, Column).
+user:portray(X) :-
+    ( blob(X, matrix)
+    ; blob(X, column)
+    ),
+    !, plblas_portray(X).
 
 zeros(Matrix) :-
     blob(Matrix, matrix),
