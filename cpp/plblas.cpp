@@ -10,8 +10,7 @@ static PL_blob_t matrix = PL_BLOB_DEFINITION(Matrix, "matrix") ;
 static PL_blob_t column = PL_BLOB_DEFINITION(Column, "column") ;
 
 struct Matrix : public PlBlob
-{
-  mat m ;
+{ mat m ;
 
   explicit Matrix()
     : PlBlob(&matrix),
@@ -33,8 +32,7 @@ struct Matrix : public PlBlob
 } ;
 
 struct Column : public PlBlob
-{
-  vec v ;
+{ vec v ;
 
   explicit Column()
     : PlBlob(&column),
@@ -85,8 +83,7 @@ static foreign_t plblas_portray(term_t a1, int arity, control_t ctx)
 PlRegister x_plblas_portray_1("plblas", "plblas_portray", 1, plblas_portray) ;
 
 void Matrix::portray(PlStream& s) const
-{
-  s.printf("Matrix(rows=%u cols=%u)\n", m.n_rows, m.n_cols) ;
+{ s.printf("Matrix(rows=%u cols=%u)\n", m.n_rows, m.n_cols) ;
   for(uword i=0; i<m.n_rows; i++)
   {
     for(uword j=0; j<m.n_cols; j++)
@@ -144,6 +141,19 @@ PREDICATE(matrix_fill, 2)
   double f = A2.as_double() ;
   ref->m.fill(f) ;
   return true ;
+}
+
+PREDICATE(column, 2)
+{ vec v(A1.as_int32_t()) ;
+  auto ref = std::unique_ptr<PlBlob>(new Column(v)) ;
+  return A2.unify_blob(&ref);
+}
+
+void Column::portray(PlStream& s) const
+{ s.printf("Column(rows=%u)\n", v.n_rows) ;
+  for(uword i=0; i<v.n_rows; i++)
+    s.printf(" %.3f\n", v(i)) ;
+  s.printf("\n") ;
 }
 
 PREDICATE(column_zeros, 1)
