@@ -93,19 +93,6 @@ void Matrix::portray(PlStream& s) const
   s.printf("\n") ;
 }
 
-PREDICATE(column, 2)
-{ vec v(A1.as_int32_t()) ;
-  auto ref = std::unique_ptr<PlBlob>(new Column(v)) ;
-  return A2.unify_blob(&ref);
-}
-
-void Column::portray(PlStream& s) const
-{
-  s.printf("Column(rows=%u)\n", v.n_rows) ;
-  for(uword i=0; i<v.n_rows; i++)
-    s.printf(" %.3f\n", v(i)) ;
-}
-
 PREDICATE(matrix_zeros, 1)
 { auto ref = PlBlobV<Matrix>::cast_ex(A1, matrix) ;
   ref->m.zeros() ;
