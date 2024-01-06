@@ -66,15 +66,16 @@ static foreign_t plblas_portray(term_t a1, int arity, control_t ctx)
 
   if(t == &matrix)
   { auto ref = PlBlobV<Matrix>::cast_ex((PlTerm) a1, matrix) ;
-    PlStream s(PlTerm_atom("current_output"), SIO_OUTPUT) ;
+    PlTerm cout = PlTerm_atom("current_output") ;
+    PlStream s(cout, SIO_OUTPUT) ;
     ref->portray(s) ;
     return true ;
   }
 
   if(t == &column)
   { auto ref = PlBlobV<Column>::cast_ex((PlTerm) a1, column) ;
-    P
-    PlStream s(PlTerm_atom("current_output"), SIO_OUTPUT) ;
+    PlTerm cout = PlTerm_atom("current_output") ;
+    PlStream s(cout, SIO_OUTPUT) ;
     ref->portray(s) ;
     return true ;
   }
