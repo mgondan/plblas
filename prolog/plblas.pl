@@ -3,14 +3,6 @@
 :- multifile user:portray/1.
 :- load_foreign_library(foreign(plblas)).
 
-ones(Matrix) :-
-    blob(Matrix, matrix),
-    !, matrix_ones(Matrix).
-
-ones(Column) :-
-    blob(Column, column),
-    !, column_ones(Column).
-
 eye(Matrix) :-
     blob(Matrix, matrix),
     !, matrix_eye(Matrix).
