@@ -118,11 +118,27 @@ static foreign_t plblas_zeros(term_t a1, int arity, control_t ctx)
 
 PlRegister x_plblas_zeros_1(NULL, "zeros", 1, plblas_zeros) ;
 
-PREDICATE(matrix_ones, 1)
-{ auto ref = PlBlobV<Matrix>::cast_ex(A1, matrix) ;
-  ref->m.ones() ;
-  return true ;
+static foreign_t plblas_ones(term_t a1, int arity, control_t ctx)
+{ PL_blob_t* t ;
+  if(((PlTerm) a1).is_blob(&t) == false)
+    return false ;
+ 
+  if(t == &matrix)
+  { auto ref = PlBlobV<Matrix>::cast_ex((PlTerm) a1, matrix) ;
+    ref->m.ones() ;
+    return true ;
+  }
+ 
+  if(t == &column)
+  { auto ref = PlBlobV<Column>::cast_ex((PlTerm) a1, column) ;
+    ref->v.ones() ;
+    return true ;
+  }
+ 
+  return false ;
 }
+
+PlRegister x_plblas_ones_1(NULL, "ones", 1, plblas_ones) ;
 
 PREDICATE(matrix_eye, 1)
 { auto ref = PlBlobV<Matrix>::cast_ex(A1, matrix) ;
@@ -160,18 +176,6 @@ void Column::portray(PlStream& s) const
   for(uword i=0; i<v.n_rows; i++)
     s.printf(" %.3f\n", v(i)) ;
   s.printf("\n") ;
-}
-
-PREDICATE(column_zeros, 1)
-{ auto ref = PlBlobV<Column>::cast_ex(A1, column) ;
-  ref->v.zeros() ;
-  return true ;
-}
-
-PREDICATE(column_ones, 1)
-{ auto ref = PlBlobV<Column>::cast_ex(A1, column) ;
-  ref->v.ones() ;
-  return true ;
 }
 
 PREDICATE(column_randu, 1)
