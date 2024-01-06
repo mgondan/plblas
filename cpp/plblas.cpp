@@ -140,11 +140,21 @@ static foreign_t plblas_ones(term_t a1, int arity, control_t ctx)
 
 PlRegister x_plblas_ones_1(NULL, "ones", 1, plblas_ones) ;
 
-PREDICATE(matrix_eye, 1)
-{ auto ref = PlBlobV<Matrix>::cast_ex(A1, matrix) ;
-  ref->m.eye() ;
-  return true ;
+static foreign_t plblas_eye(term_t a1, int arity, control_t ctx)
+{ PL_blob_t* t ;
+  if(((PlTerm) a1).is_blob(&t) == false)
+    return false ;
+ 
+  if(t == &matrix)
+  { auto ref = PlBlobV<Matrix>::cast_ex((PlTerm) a1, matrix) ;
+    ref->m.eye() ;
+    return true ;
+  }
+ 
+  return false ;
 }
+
+PlRegister x_plblas_eye_1(NULL, "eye", 1, plblas_eye) ;
 
 PREDICATE(matrix_randu, 1)
 { auto ref = PlBlobV<Matrix>::cast_ex(A1, matrix) ;
