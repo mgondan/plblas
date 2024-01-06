@@ -73,6 +73,7 @@ static foreign_t plblas_portray(term_t a1, int arity, control_t ctx)
 
   if(t == &column)
   { auto ref = PlBlobV<Column>::cast_ex((PlTerm) a1, column) ;
+    P
     PlStream s(PlTerm_atom("current_output"), SIO_OUTPUT) ;
     ref->portray(s) ;
     return true ;
@@ -98,14 +99,16 @@ static foreign_t plblas_zeros(term_t a1, int arity, control_t ctx)
 { PL_blob_t* t ;
   if(((PlTerm) a1).is_blob(&t) == false)
     return false ;
+ 
   if(t == &matrix)
   { auto ref = PlBlobV<Matrix>::cast_ex((PlTerm) a1, matrix) ;
     ref->m.zeros() ;
     return true ;
   }
+ 
   if(t == &column)
   { auto ref = PlBlobV<Column>::cast_ex((PlTerm) a1, column) ;
-    ref->m.zeros() ;
+    ref->v.zeros() ;
     return true ;
   }
  
@@ -113,12 +116,6 @@ static foreign_t plblas_zeros(term_t a1, int arity, control_t ctx)
 }
 
 PlRegister x_plblas_zeros_1(NULL, "zeros", 1, plblas_zeros) ;
-
-PREDICATE(matrix_zeros, 1)
-{ auto ref = PlBlobV<Matrix>::cast_ex(A1, matrix) ;
-  ref->m.zeros() ;
-  return true ;
-}
 
 PREDICATE(matrix_ones, 1)
 { auto ref = PlBlobV<Matrix>::cast_ex(A1, matrix) ;
