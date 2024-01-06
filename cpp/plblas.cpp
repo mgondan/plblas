@@ -100,12 +100,12 @@ static foreign_t plblas_zeros(term_t a1, int arity, control_t ctx)
     return false ;
   if(t == &matrix)
   { auto ref = PlBlobV<Matrix>::cast_ex((PlTerm) a1, matrix) ;
-    ref->zeros() ;
+    ref->m.zeros() ;
     return true ;
   }
   if(t == &column)
   { auto ref = PlBlobV<Column>::cast_ex((PlTerm) a1, column) ;
-    ref->zeros() ;
+    ref->m.zeros() ;
     return true ;
   }
  
