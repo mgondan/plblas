@@ -59,6 +59,12 @@ PREDICATE(matrix, 3)
   return A3.unify_blob(&ref) ;
 }
 
+PREDICATE(column, 2)
+{ vec v(A1.as_int32_t()) ;
+  auto ref = std::unique_ptr<PlBlob>(new Column(v)) ;
+  return A2.unify_blob(&ref);
+}
+
 static foreign_t plblas_portray(term_t a1, int arity, control_t ctx)
 { PL_blob_t* t ;
   if(((PlTerm) a1).is_blob(&t) == false)
@@ -93,6 +99,13 @@ void Matrix::portray(PlStream& s) const
       s.printf(" %.3f", m(i, j)) ;
     s.printf("\n") ;
   }
+  s.printf("\n") ;
+}
+
+void Column::portray(PlStream& s) const
+{ s.printf("Column(rows=%u)\n", v.n_rows) ;
+  for(uword i=0; i<v.n_rows; i++)
+    s.printf(" %.3f\n", v(i)) ;
   s.printf("\n") ;
 }
 
@@ -155,7 +168,7 @@ PREDICATE(eye, 1)
 
 PREDICATE(randu, 1)
 { PL_blob_t* t ;
-  if((!A1.is_blob(&t))
+  if(!A1.is_blob(&t))
     return false ;
  
   if(t == &matrix)
@@ -193,31 +206,26 @@ PREDICATE(randn, 1)
   return false ;
 }
 
-PREDICATE(matrix_fill, 2)
-{ auto ref = PlBlobV<Matrix>::cast_ex(A1, matrix) ;
-  double f = A2.as_double() ;
-  ref->m.fill(f) ;
-  return true ;
-}
+PREDICATE(fill, 2)
+{ double f = A2.as_double() ;
 
-PREDICATE(column, 2)
-{ vec v(A1.as_int32_t()) ;
-  auto ref = std::unique_ptr<PlBlob>(new Column(v)) ;
-  return A2.unify_blob(&ref);
-}
+  PL_blob_t* t ;
+  if(!A1.is_blob(&t))
+    return false ;
+ 
+  if(t == &matrix)
+  { auto ref = PlBlobV<Matrix>::cast_ex(A1, matrix) ;
+    ref->m.fill(f) ;
+    return true ;
+  }
 
-void Column::portray(PlStream& s) const
-{ s.printf("Column(rows=%u)\n", v.n_rows) ;
-  for(uword i=0; i<v.n_rows; i++)
-    s.printf(" %.3f\n", v(i)) ;
-  s.printf("\n") ;
-}
+  if(t == &column)
+  { auto ref = PlBlobV<Column>::cast_ex(A1, column) ;
+    ref->v.fill(f) ;
+    return true ;
+  }
 
-PREDICATE(column_fill, 2)
-{ auto ref = PlBlobV<Column>::cast_ex(A1, column) ;
-  double f = A2.as_double() ;
-  ref->v.fill(f) ;
-  return true ;
+  return false ;
 }
 
 PREDICATE(mult, 3)
