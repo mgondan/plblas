@@ -152,7 +152,7 @@ static foreign_t plblas_eye(term_t a1, int arity, control_t ctx)
   }
 
   if(t == &column)
-    PlTypeError("Column", "Matrix") ;
+    PlTypeError("Matrix", "Column") ;
  
   return false ;
 }
