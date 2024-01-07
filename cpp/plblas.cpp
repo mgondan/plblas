@@ -96,27 +96,25 @@ void Matrix::portray(PlStream& s) const
   s.printf("\n") ;
 }
 
-static foreign_t plblas_zeros(term_t a1, int arity, control_t ctx)
+PREDICATE(zeros, 1)
 { PL_blob_t* t ;
-  if(((PlTerm) a1).is_blob(&t) == false)
+  if(!A1.is_blob(&t))
     return false ;
  
   if(t == &matrix)
-  { auto ref = PlBlobV<Matrix>::cast_ex((PlTerm) a1, matrix) ;
+  { auto ref = PlBlobV<Matrix>::cast_ex(A1, matrix) ;
     ref->m.zeros() ;
     return true ;
   }
  
   if(t == &column)
-  { auto ref = PlBlobV<Column>::cast_ex((PlTerm) a1, column) ;
+  { auto ref = PlBlobV<Column>::cast_ex(A1, column) ;
     ref->v.zeros() ;
     return true ;
   }
  
   return false ;
 }
-
-PlRegister x_plblas_zeros_1(NULL, "zeros", 1, plblas_zeros) ;
 
 static foreign_t plblas_ones(term_t a1, int arity, control_t ctx)
 { PL_blob_t* t ;
