@@ -150,6 +150,9 @@ static foreign_t plblas_eye(term_t a1, int arity, control_t ctx)
     ref->m.eye() ;
     return true ;
   }
+
+  if(t == &column)
+    PlTypeError("Column", "Matrix") ;
  
   return false ;
 }
