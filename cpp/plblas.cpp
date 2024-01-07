@@ -116,19 +116,19 @@ PREDICATE(zeros, 1)
   return false ;
 }
 
-static foreign_t plblas_ones(term_t a1, int arity, control_t ctx)
+PREDICATE(ones, 1)
 { PL_blob_t* t ;
-  if(((PlTerm) a1).is_blob(&t) == false)
+  if(!A1.is_blob(&t))
     return false ;
  
   if(t == &matrix)
-  { auto ref = PlBlobV<Matrix>::cast_ex((PlTerm) a1, matrix) ;
+  { auto ref = PlBlobV<Matrix>::cast_ex(A1, matrix) ;
     ref->m.ones() ;
     return true ;
   }
  
   if(t == &column)
-  { auto ref = PlBlobV<Column>::cast_ex((PlTerm) a1, column) ;
+  { auto ref = PlBlobV<Column>::cast_ex(A1, column) ;
     ref->v.ones() ;
     return true ;
   }
@@ -136,40 +136,36 @@ static foreign_t plblas_ones(term_t a1, int arity, control_t ctx)
   return false ;
 }
 
-PlRegister x_plblas_ones_1(NULL, "ones", 1, plblas_ones) ;
-
-static foreign_t plblas_eye(term_t a1, int arity, control_t ctx)
+PREDICATE(eye, 1)
 { PL_blob_t* t ;
-  if(((PlTerm) a1).is_blob(&t) == false)
+  if(!A1.is_blob(&t))
     return false ;
  
   if(t == &matrix)
-  { auto ref = PlBlobV<Matrix>::cast_ex((PlTerm) a1, matrix) ;
+  { auto ref = PlBlobV<Matrix>::cast_ex(A1, matrix) ;
     ref->m.eye() ;
     return true ;
   }
 
   if(t == &column)
-    PlTypeError("Matrix", (PlTerm) a1).plThrow() ;
+    throw PlTypeError("Matrix", A1) ;
  
   return false ;
 }
 
-PlRegister x_plblas_eye_1(NULL, "eye", 1, plblas_eye) ;
-
-static foreign_t plblas_randu(term_t a1, int arity, control_t ctx)
+PREDICATE(randu, 1)
 { PL_blob_t* t ;
-  if(((PlTerm) a1).is_blob(&t) == false)
+  if((!A1.is_blob(&t))
     return false ;
  
   if(t == &matrix)
-  { auto ref = PlBlobV<Matrix>::cast_ex((PlTerm) a1, matrix) ;
+  { auto ref = PlBlobV<Matrix>::cast_ex(A1, matrix) ;
     ref->m.randu() ;
     return true ;
   }
  
   if(t == &column)
-  { auto ref = PlBlobV<Column>::cast_ex((PlTerm) a1, column) ;
+  { auto ref = PlBlobV<Column>::cast_ex(A1, column) ;
     ref->v.randu() ;
     return true ;
   }
@@ -177,30 +173,25 @@ static foreign_t plblas_randu(term_t a1, int arity, control_t ctx)
   return false ;
 }
 
-PlRegister x_plblas_randu_1(NULL, "randu", 1, plblas_randu) ;
-
-static foreign_t plblas_randn(term_t a1, int arity, control_t ctx)
+PREDICATE(randn, 1)
 { PL_blob_t* t ;
-  if(((PlTerm) a1).is_blob(&t) == false)
+  if(!A1.is_blob(&t))
     return false ;
  
   if(t == &matrix)
-  { auto ref = PlBlobV<Matrix>::cast_ex((PlTerm) a1, matrix) ;
+  { auto ref = PlBlobV<Matrix>::cast_ex(A1, matrix) ;
     ref->m.randn() ;
     return true ;
   }
  
   if(t == &column)
-  { auto ref = PlBlobV<Column>::cast_ex((PlTerm) a1, column) ;
+  { auto ref = PlBlobV<Column>::cast_ex(A1, column) ;
     ref->v.randn() ;
     return true ;
   }
  
   return false ;
 }
-
-PlRegister x_plblas_randn_1(NULL, "randn", 1, plblas_randn) ;
-
 
 PREDICATE(matrix_fill, 2)
 { auto ref = PlBlobV<Matrix>::cast_ex(A1, matrix) ;
