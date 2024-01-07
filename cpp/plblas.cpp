@@ -178,11 +178,28 @@ static foreign_t plblas_randu(term_t a1, int arity, control_t ctx)
 
 PlRegister x_plblas_randu_1(NULL, "randu", 1, plblas_randu) ;
 
-PREDICATE(matrix_randn, 1)
-{ auto ref = PlBlobV<Matrix>::cast_ex(A1, matrix) ;
-  ref->m.randn() ;
-  return true ;
+static foreign_t plblas_randn(term_t a1, int arity, control_t ctx)
+{ PL_blob_t* t ;
+  if(((PlTerm) a1).is_blob(&t) == false)
+    return false ;
+ 
+  if(t == &matrix)
+  { auto ref = PlBlobV<Matrix>::cast_ex((PlTerm) a1, matrix) ;
+    ref->m.randn() ;
+    return true ;
+  }
+ 
+  if(t == &column)
+  { auto ref = PlBlobV<Column>::cast_ex((PlTerm) a1, column) ;
+    ref->v.randn() ;
+    return true ;
+  }
+ 
+  return false ;
 }
+
+PlRegister x_plblas_randn_1(NULL, "randn", 1, plblas_randn) ;
+
 
 PREDICATE(matrix_fill, 2)
 { auto ref = PlBlobV<Matrix>::cast_ex(A1, matrix) ;
@@ -202,12 +219,6 @@ void Column::portray(PlStream& s) const
   for(uword i=0; i<v.n_rows; i++)
     s.printf(" %.3f\n", v(i)) ;
   s.printf("\n") ;
-}
-
-PREDICATE(column_randn, 1)
-{ auto ref = PlBlobV<Column>::cast_ex(A1, column) ;
-  ref->v.randn() ;
-  return true ;
 }
 
 PREDICATE(column_fill, 2)
