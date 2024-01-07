@@ -3,14 +3,6 @@
 :- multifile user:portray/1.
 :- load_foreign_library(foreign(plblas)).
 
-randu(Matrix) :-
-    blob(Matrix, matrix),
-    !, matrix_randu(Matrix).
-
-randu(Column) :-
-    blob(Column, column),
-    !, column_randu(Column).
-
 randn(Matrix) :-
     blob(Matrix, matrix),
     !, matrix_randn(Matrix).
