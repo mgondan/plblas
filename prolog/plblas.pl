@@ -3,14 +3,6 @@
 :- multifile user:portray/1.
 :- load_foreign_library(foreign(plblas)).
 
-fill(Matrix, Value) :-
-    blob(Matrix, matrix),
-    !, matrix_fill(Matrix, Value).
-
-fill(Column, Value) :-
-    blob(Column, column),
-    !, column_fill(Column, Value).
-
 get0(Row, Col, Matrix, Value) :-
     blob(Matrix, matrix),
     !, matrix_get0(Row, Col, Matrix, Value).
