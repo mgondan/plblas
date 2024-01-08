@@ -220,12 +220,100 @@ PREDICATE(fill, 2)
   throw PlTypeError("Matrix or Column", A1) ;
 }
 
-PREDICATE(mult, 3)
-{ auto a = PlBlobV<Matrix>::cast_ex(A1, matrix) ;
-  auto b = PlBlobV<Matrix>::cast_ex(A2, matrix) ;
-  mat m = a->m * b->m ;
-  auto ref = std::unique_ptr<PlBlob>(new Matrix(m)) ;
-  return A3.unify_blob(&ref) ;
+PREDICATE(sum, 3)
+{ PL_blob_t *t1, *t2 ;
+  if(A1.is_blob(&t1) && t1 == &matrix && A2.is_blob(&t2) && t2 == &matrix)
+  { auto m1 = PlBlobV<Matrix>::cast_ex(A1, matrix) ;
+    auto m2 = PlBlobV<Matrix>::cast_ex(A2, matrix) ;
+
+    try
+    { mat m = m1->m + m2->m ;
+      auto ref = std::unique_ptr<PlBlob>(new Matrix(m)) ;
+      return A3.unify_blob(&ref) ;
+    }
+
+    catch(std::exception& e)
+    { throw PlDomainError(e.what(), PlCompound("+", PlTermv(A1, A2))) ;
+    }
+  }
+
+  if(A1.is_blob(&t1) && t1 == &matrix && A2.is_blob(&t2) && t2 == &column)
+  { auto m1 = PlBlobV<Matrix>::cast_ex(A1, matrix) ;
+    auto m2 = PlBlobV<Column>::cast_ex(A2, column) ;
+    mat m = m1->m + m2->v ;
+    auto ref = std::unique_ptr<PlBlob>(new Matrix(m)) ;
+    return A3.unify_blob(&ref) ;
+  }
+
+  if(A1.is_blob(&t1) && t1 == &column && A2.is_blob(&t2) && t2 == &matrix)
+  { auto m1 = PlBlobV<Column>::cast_ex(A1, column) ;
+    auto m2 = PlBlobV<Matrix>::cast_ex(A2, matrix) ;
+    mat m = m1->v + m2->m ;
+    auto ref = std::unique_ptr<PlBlob>(new Matrix(m)) ;
+    return A3.unify_blob(&ref) ;
+  }
+
+  if(A1.is_blob(&t1) && t1 == &column && A2.is_blob(&t2) && t2 == &column)
+  { auto m1 = PlBlobV<Column>::cast_ex(A1, column) ;
+    auto m2 = PlBlobV<Column>::cast_ex(A2, column) ;
+    mat m = m1->v + m2->v ;
+    auto ref = std::unique_ptr<PlBlob>(new Matrix(m)) ;
+    return A3.unify_blob(&ref) ;
+  }
+
+  if(!A1.is_blob(&t1) || (t1 != &matrix && t1 != &column))
+    throw PlTypeError("Matrix or Column", A1) ;
+
+  // if(!A2.is_blob(&t2) || (t2 != &matrix && t2 != &column))
+  throw PlTypeError("Matrix or Column", A2) ;
+}
+
+PREDICATE(prod, 3)
+{ PL_blob_t *t1, *t2 ;
+  if(A1.is_blob(&t1) && t1 == &matrix && A2.is_blob(&t2) && t2 == &matrix)
+  { auto m1 = PlBlobV<Matrix>::cast_ex(A1, matrix) ;
+    auto m2 = PlBlobV<Matrix>::cast_ex(A2, matrix) ;
+
+    try
+    { mat m = m1->m * m2->m ;
+      auto ref = std::unique_ptr<PlBlob>(new Matrix(m)) ;
+      return A3.unify_blob(&ref) ;
+    }
+
+    catch(std::exception& e)
+    { throw PlDomainError(e.what(), PlCompound("*", PlTermv(A1, A2))) ;
+    }
+  }
+
+  if(A1.is_blob(&t1) && t1 == &matrix && A2.is_blob(&t2) && t2 == &column)
+  { auto m1 = PlBlobV<Matrix>::cast_ex(A1, matrix) ;
+    auto m2 = PlBlobV<Column>::cast_ex(A2, column) ;
+    mat m = m1->m * m2->v ;
+    auto ref = std::unique_ptr<PlBlob>(new Matrix(m)) ;
+    return A3.unify_blob(&ref) ;
+  }
+
+  if(A1.is_blob(&t1) && t1 == &column && A2.is_blob(&t2) && t2 == &matrix)
+  { auto m1 = PlBlobV<Column>::cast_ex(A1, column) ;
+    auto m2 = PlBlobV<Matrix>::cast_ex(A2, matrix) ;
+    mat m = m1->v * m2->m ;
+    auto ref = std::unique_ptr<PlBlob>(new Matrix(m)) ;
+    return A3.unify_blob(&ref) ;
+  }
+
+  if(A1.is_blob(&t1) && t1 == &column && A2.is_blob(&t2) && t2 == &column)
+  { auto m1 = PlBlobV<Column>::cast_ex(A1, column) ;
+    auto m2 = PlBlobV<Column>::cast_ex(A2, column) ;
+    mat m = m1->v * m2->v ;
+    auto ref = std::unique_ptr<PlBlob>(new Matrix(m)) ;
+    return A3.unify_blob(&ref) ;
+  }
+
+  if(!A1.is_blob(&t1) || (t1 != &matrix && t1 != &column))
+    throw PlTypeError("Matrix or Column", A1) ;
+
+  // if(!A2.is_blob(&t2) || (t2 != &matrix && t2 != &column))
+  throw PlTypeError("Matrix or Column", A2) ;
 }
 
 PREDICATE(get0, 4)
