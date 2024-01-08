@@ -94,8 +94,7 @@ PlRegister x_plblas_portray_1("user", "portray", 1, plblas_portray) ;
 void Matrix::portray(PlStream& s) const
 { s.printf("Matrix(rows=%u cols=%u)\n", m.n_rows, m.n_cols) ;
   for(uword i=0; i<m.n_rows; i++)
-  {
-    for(uword j=0; j<m.n_cols; j++)
+  { for(uword j=0; j<m.n_cols; j++)
       s.printf(" %.3f", m(i, j)) ;
     s.printf("\n") ;
   }
@@ -125,8 +124,8 @@ PREDICATE(zeros, 1)
     ref->v.zeros() ;
     return true ;
   }
- 
-  return false ;
+
+  throw PlTypeError("Matrix or Column", A1) ;
 }
 
 PREDICATE(ones, 1)
@@ -145,8 +144,8 @@ PREDICATE(ones, 1)
     ref->v.ones() ;
     return true ;
   }
- 
-  return false ;
+
+  throw PlTypeError("Matrix or Column", A1) ;
 }
 
 PREDICATE(eye, 1)
@@ -160,10 +159,7 @@ PREDICATE(eye, 1)
     return true ;
   }
 
-  if(t == &column)
-    throw PlTypeError("Matrix", A1) ;
- 
-  return false ;
+  throw PlTypeError("Matrix", A1) ;
 }
 
 PREDICATE(randu, 1)
@@ -182,8 +178,8 @@ PREDICATE(randu, 1)
     ref->v.randu() ;
     return true ;
   }
- 
-  return false ;
+
+  throw PlTypeError("Matrix or Column", A1) ;
 }
 
 PREDICATE(randn, 1)
@@ -202,30 +198,26 @@ PREDICATE(randn, 1)
     ref->v.randn() ;
     return true ;
   }
- 
-  return false ;
+
+  throw PlTypeError("Matrix or Column", A1) ;
 }
 
 PREDICATE(fill, 2)
 { double f = A2.as_double() ;
-
   PL_blob_t* t ;
-  if(!A1.is_blob(&t))
-    return false ;
- 
-  if(t == &matrix)
+  if(A1.is_blob(&t) && t == &matrix)
   { auto ref = PlBlobV<Matrix>::cast_ex(A1, matrix) ;
     ref->m.fill(f) ;
     return true ;
   }
 
-  if(t == &column)
+  if(A1.is_blob(&t) && t == &column)
   { auto ref = PlBlobV<Column>::cast_ex(A1, column) ;
     ref->v.fill(f) ;
     return true ;
   }
 
-  return false ;
+  throw PlTypeError("Matrix or Column", A1) ;
 }
 
 PREDICATE(mult, 3)
@@ -236,7 +228,7 @@ PREDICATE(mult, 3)
   return A3.unify_blob(&ref) ;
 }
 
-PREDICATE(matrix_get0, 4)
+PREDICATE(get0, 4)
 { auto r = A1.as_int32_t() ;
   auto c = A2.as_int32_t() ;
   auto ref = PlBlobV<Matrix>::cast_ex(A3, matrix) ;
@@ -244,7 +236,14 @@ PREDICATE(matrix_get0, 4)
   return A4.unify_float(x) ;
 }
 
-PREDICATE(matrix_get1, 4)
+PREDICATE(get0, 3)
+{ auto i = A1.as_int32_t() ;
+  auto ref = PlBlobV<Column>::cast_ex(A2, column) ;
+  double x = ref->v(i) ;
+  return A3.unify_float(x) ;
+}
+
+PREDICATE(get1, 4)
 { auto r = A1.as_int32_t() ;
   auto c = A2.as_int32_t() ;
   auto ref = PlBlobV<Matrix>::cast_ex(A3, matrix) ;
@@ -252,7 +251,14 @@ PREDICATE(matrix_get1, 4)
   return A4.unify_float(x) ;
 }
 
-PREDICATE(matrix_put0, 4)
+PREDICATE(get1, 3)
+{ auto i = A1.as_int32_t() ;
+  auto ref = PlBlobV<Column>::cast_ex(A2, column) ;
+  double x = ref->v(--i) ;
+  return A3.unify_float(x) ;
+}
+
+PREDICATE(put0, 4)
 { auto r = A1.as_int32_t() ;
   auto c = A2.as_int32_t() ;
   auto ref = PlBlobV<Matrix>::cast_ex(A3, matrix) ;
@@ -261,7 +267,15 @@ PREDICATE(matrix_put0, 4)
   return true ;
 }
 
-PREDICATE(matrix_put1, 4)
+PREDICATE(put0, 3)
+{ auto i = A1.as_int32_t() ;
+  auto ref = PlBlobV<Column>::cast_ex(A2, column) ;
+  double x = A3.as_double() ;
+  ref->v(i) = x ;
+  return true ;
+}
+
+PREDICATE(put1, 4)
 { auto r = A1.as_int32_t() ;
   auto c = A2.as_int32_t() ;
   auto ref = PlBlobV<Matrix>::cast_ex(A3, matrix) ;
@@ -270,29 +284,7 @@ PREDICATE(matrix_put1, 4)
   return true ;
 }
 
-PREDICATE(column_get0, 3)
-{ auto i = A1.as_int32_t() ;
-  auto ref = PlBlobV<Column>::cast_ex(A2, column) ;
-  double x = ref->v(i) ;
-  return A3.unify_float(x) ;
-}
-
-PREDICATE(column_get1, 3)
-{ auto i = A1.as_int32_t() ;
-  auto ref = PlBlobV<Column>::cast_ex(A2, column) ;
-  double x = ref->v(--i) ;
-  return A3.unify_float(x) ;
-}
-
-PREDICATE(column_put0, 3)
-{ auto i = A1.as_int32_t() ;
-  auto ref = PlBlobV<Column>::cast_ex(A2, column) ;
-  double x = A3.as_double() ;
-  ref->v(i) = x ;
-  return true ;
-}
-
-PREDICATE(column_put1, 3)
+PREDICATE(put1, 3)
 { auto i = A1.as_int32_t() ;
   auto ref = PlBlobV<Column>::cast_ex(A2, column) ;
   double x = A3.as_double() ;
