@@ -67,11 +67,11 @@ PREDICATE(column, 2)
 
 static foreign_t plblas_portray(term_t a1, int arity, control_t ctx)
 { PL_blob_t* t ;
-  if(((PlTerm) a1).is_blob(&t) == false)
+  if(static_cast<PlTerm>(a1).is_blob(&t) == false)
     return false ;
 
   if(t == &matrix)
-  { auto ref = PlBlobV<Matrix>::cast_ex((PlTerm) a1, matrix) ;
+  { auto ref = PlBlobV<Matrix>::cast_ex(static_cast<PlTerm>(a1), matrix) ;
     PlTerm cout = PlTerm_atom("current_output") ;
     PlStream s(cout, SIO_OUTPUT) ;
     ref->portray(s) ;
@@ -79,7 +79,7 @@ static foreign_t plblas_portray(term_t a1, int arity, control_t ctx)
   }
 
   if(t == &column)
-  { auto ref = PlBlobV<Column>::cast_ex((PlTerm) a1, column) ;
+  { auto ref = PlBlobV<Column>::cast_ex(static_cast<PlTerm>(a1), column) ;
     PlTerm cout = PlTerm_atom("current_output") ;
     PlStream s(cout, SIO_OUTPUT) ;
     ref->portray(s) ;
